@@ -6,7 +6,7 @@ export const COLORS = {
     secondary: '#ea580c'
 } as const
 
-export const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbykrW6R5gFrcgIW7nQM-o-zP9rIF59VEt3pxhyirw6S9YidfehW9pefmjdi10R6pViU/exec'
+export const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwyXLbJ2CbRAmFyIpS3BTEQMTsGC1VwQwxhuo-5uNFRzfnUoKqmIWPgczSTfB-5oRLBKg/exec'
 
 export const SHEET_TABS = [
     'daily',
