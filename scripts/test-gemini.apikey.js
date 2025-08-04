@@ -1,5 +1,5 @@
 /**
- * Test Gemini API v3 (updated June 2025)
+ * Test Gemini API v2.5 (updated August 2025)
  * (c) MikeRhodes.com.au
  *
  * Purpose: Quickly test your API KEY & Gemini account from a Google Ads script.
@@ -28,7 +28,7 @@ function main() {
     }
 
     const startTime = new Date().getTime();
-    const modelName = "gemini-2.0-flash";
+    const modelName = "gemini-2.5-flash";
     const output = generateTextGemini(PROMPT, API_KEY, modelName);
     Logger.log("Text output: " + output);
 
@@ -47,7 +47,7 @@ function main() {
  *
  * @param {string} prompt   The user prompt to send.
  * @param {string} apiKey   Your Gemini API key.
- * @param {string} model    The model name (e.g., "gemini-2.0-flash").
+ * @param {string} model    The model name (e.g., "gemini-2.5-flash").
  * @return {string}         The assistant's response or an error message.
  */
 function generateTextGemini(prompt, apiKey, model) {

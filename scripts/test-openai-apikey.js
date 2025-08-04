@@ -1,11 +1,11 @@
 /**
- * Test OpenAI API v3 (updated June 2025)
+ * Test OpenAI API v4.1 (updated August 2025)
  * (c) MikeRhodes.com.au
  *
  * Purpose: Quickly test your API KEY & OpenAI account from a Google Ads script.
  *
  * If you need an API key, visit:
- *   https://platform.openai.com/api-keys
+ *   https://platform.openai.com/account/api-keys
  *
  * To learn about optional parameters (e.g., temperature, max_tokens), see:
  *   https://platform.openai.com/docs/api-reference/chat/create
@@ -40,7 +40,7 @@ function main() {
     }
 
     const startTime = new Date().getTime();
-    const modelName = "gpt-4o-mini";
+    const modelName = "gpt-4.1-mini";
     const output = generateTextOpenAI(PROMPT, API_KEY, modelName);
     Logger.log("Text output: " + output);
 
@@ -59,7 +59,7 @@ function main() {
  *
  * @param {string} prompt  The user prompt to send.
  * @param {string} apiKey  Your OpenAI API key.
- * @param {string} model   The model name (e.g., "gpt-4o-mini").
+ * @param {string} model   The model name (e.g., "gpt-4.1-mini").
  * @return {string}        The assistant's response or an error message.
  */
 function generateTextOpenAI(prompt, apiKey, model) {
@@ -110,7 +110,7 @@ function generateTextOpenAI(prompt, apiKey, model) {
 
   if (responseCode !== 200) {
     Logger.log("Error: OpenAI API request failed after 3 attempts. Status: " + responseCode);
-    Logger.log("See https://help.openai.com/en/articles/6891839-api-error-codes for more info.");
+    Logger.log("See https://platform.openai.com/docs/guides/error-codes for more info.");
     try {
       const errorJson = JSON.parse(responseText);
       Logger.log("Error details: " + JSON.stringify(errorJson.error));

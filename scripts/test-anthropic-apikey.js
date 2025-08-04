@@ -1,5 +1,5 @@
 /**
- * Test Anthropic API v3 (updated June 2025)
+ * Test Anthropic API v4 (updated August 2025)
  * (c) MikeRhodes.com.au
  *
  * Purpose: Quickly test your Anthropic API Key & account from a Google Ads script.
@@ -8,7 +8,7 @@
  *   https://console.anthropic.com/settings/keys
  *
  * To learn about optional parameters (e.g., max_tokens, temperature), see:
- *   https://docs.anthropic.com/api
+ *   https://docs.anthropic.com/en/api/messages
  */
 
 
