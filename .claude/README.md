@@ -62,12 +62,11 @@ macOS includes 14 system sounds you can use:
 - Glass.aiff - **Glass breaking** (task complete)
 - Hero.aiff - Triumphant fanfare
 - Morse.aiff - Morse code beep
-- Ping.aiff - **Sonar ping** (notifications)
+- Ping.aiff - **Sonar ping** 
 - Pop.aiff - Quick pop
 - Purr.aiff - Cat purring
 - Sosumi.aiff - Classic Mac sound
-- Submarine.aiff - Submarine sonar
-- Tink.aiff - **Metallic tink** (bash complete)
+- Submarine.aiff - Submarine sonar (notifications)
 
 ## Testing Sounds
 

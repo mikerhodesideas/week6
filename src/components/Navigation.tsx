@@ -38,15 +38,6 @@ export function Navigation() {
                             Ad Groups
                         </Link>
                         <Link
-                            href="/insights"
-                            className={cn(
-                                "text-sm font-medium transition-colors hover:text-foreground/80",
-                                pathname === "/insights" ? "text-foreground" : "text-foreground/60"
-                            )}
-                        >
-                            Data Insights
-                        </Link>
-                        <Link
                             href="/data-test"
                             className={cn(
                                 "text-sm font-medium transition-colors hover:text-foreground/80",

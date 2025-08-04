@@ -219,7 +219,7 @@ export default function AdGroupsPage() {
                         </h1>
                     </div>
                     <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                        Comprehensive insights into your ad group performance with advanced filtering and analytics
+                        Comprehensive analysis of your ad group performance with advanced filtering and analytics
                     </p>
                 </div>
 

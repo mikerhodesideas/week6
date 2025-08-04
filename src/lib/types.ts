@@ -201,7 +201,7 @@ export type TabData = {
 // Helper type to get numeric values from metrics
 export type MetricValue<T> = T extends number ? T : never
 
-// Data Insights Types
+// Data Analysis Types
 export type DataSourceType = keyof TabData
 
 export type ColumnType = 'metric' | 'dimension' | 'date'
