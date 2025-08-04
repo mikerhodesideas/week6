@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:platform.openai.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:www.pascal-poredda.com)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(ln:*)",
+      "Bash(chmod:*)",
+      "Bash(afplay:*)",
+      "Bash(mv:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(node:*)"
+    ],
+    "deny": []
+  }
+}

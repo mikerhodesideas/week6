@@ -1,14 +1,17 @@
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1lMiKofgjbw-Cy0048lOHPOtweq2FD6LIJpnqKBAQ4IQ/';       // add your sheet url here
-const SEARCH_TERMS_TAB = 'SearchTerms';
-const DAILY_TAB = 'Daily';
-const AD_GROUP_TAB = 'AdGroups';  // New tab for ad group data
-const ASSET_GROUPS_TAB = 'AssetGroups'; // New tab for asset group data
-const NEGATIVE_KEYWORD_LISTS_TAB = 'NegativeKeywordLists'; // Tab for shared negative lists
-const CAMPAIGN_NEGATIVES_TAB = 'CampaignNegatives'; // Tab for campaign-level negatives
-const ADGROUP_NEGATIVES_TAB = 'AdGroupNegatives'; // Tab for ad group-level negatives
-const CAMPAIGN_STATUS_TAB = 'CampaignStatus'; // Tab for campaign status
-const SHARED_LIST_KEYWORDS_TAB = 'SharedListKeywords'; // Tab for keywords within shared lists
-const LANDING_PAGES_TAB = 'LandingPages'; // Tab for landing pages
+// change the sheet name to your sheet
+
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UighiMWgRVoc33mVNGerx7WDLZBCdxhdRdc32h5R_d8/edit?gid=0#gid=0';
+
+const SEARCH_TERMS_TAB = 'searchTerms';
+const DAILY_TAB = 'daily';
+const AD_GROUP_TAB = 'adGroups';  // New tab for ad group data
+const ASSET_GROUPS_TAB = 'assetGroups'; // New tab for asset group data
+const NEGATIVE_KEYWORD_LISTS_TAB = 'negativeKeywordLists'; // Tab for shared negative lists
+const CAMPAIGN_NEGATIVES_TAB = 'campaignNegatives'; // Tab for campaign-level negatives
+const ADGROUP_NEGATIVES_TAB = 'adGroupNegatives'; // Tab for ad group-level negatives
+const CAMPAIGN_STATUS_TAB = 'campaignStatus'; // Tab for campaign status
+const SHARED_LIST_KEYWORDS_TAB = 'sharedListKeywords'; // Tab for keywords within shared lists
+const LANDING_PAGES_TAB = 'landingPages'; // Tab for landing pages
 
 const NUMBER_OF_DAYS = 400; // Added for flexible date ranges
 
@@ -283,7 +286,7 @@ function main() {
     processTab(
       ss,
       LANDING_PAGES_TAB,
-      ["url", "impressions", "clicks", "cost", "conversions", "value", "ctr", "cvr", "cpa", "roas"],
+      ["url", "impr", "clicks", "cost", "conv", "value", "ctr", "convRate", "cpa", "roas"],
       LANDING_PAGES_QUERY,
       processLandingPages
     );

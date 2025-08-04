@@ -314,13 +314,13 @@ async function fetchAndParseLandingPages(sheetUrl: string): Promise<LandingPage[
 
     return rawData.map((row: any) => ({
       url: String(row['url'] || ''),
-      impressions: Number(row['impressions'] || 0),
+      impr: Number(row['impr'] || 0),
       clicks: Number(row['clicks'] || 0),
       cost: Number(row['cost'] || 0),
-      conversions: Number(row['conversions'] || 0),
+      conv: Number(row['conv'] || 0),
       value: Number(row['value'] || 0),
       ctr: Number(row['ctr'] || 0),
-      cvr: Number(row['cvr'] || 0),
+      convRate: Number(row['convRate'] || 0),
       cpa: Number(row['cpa'] || 0),
       roas: Number(row['roas'] || 0)
     }));
