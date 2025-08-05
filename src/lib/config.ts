@@ -8,6 +8,11 @@ export const COLORS = {
 
 export const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwyXLbJ2CbRAmFyIpS3BTEQMTsGC1VwQwxhuo-5uNFRzfnUoKqmIWPgczSTfB-5oRLBKg/exec'
 
+// Data Insights Configuration
+export const MAX_RECOMMENDED_INSIGHT_ROWS = 1000
+export const DEFAULT_PREVIEW_ROWS = 10
+export const PREVIEW_ROW_OPTIONS = [5, 10, 30, 50, 100]
+
 export const SHEET_TABS = [
     'daily',
     'searchTerms',

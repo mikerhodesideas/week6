@@ -16,6 +16,30 @@ export interface LLMResponse {
     model?: string
 }
 
+export interface GenerateInsightsOptions {
+    prompt: string
+    data: any[]
+    dataSource: string
+    filters: string[]
+    totalRows: number
+    analyzedRows: number
+    currency: string
+    provider?: LLMProvider
+    model?: string
+}
+
+export interface InsightRequest {
+    prompt: string
+    data: any[]
+    dataSource: string
+    filters: string[]
+    totalRows: number
+    analyzedRows: number
+    currency: string
+    provider: LLMProvider
+    model: string
+    apiKey?: string
+}
 
 export interface LLMModel {
     id: string
