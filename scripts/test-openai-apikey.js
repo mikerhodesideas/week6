@@ -12,23 +12,19 @@
  */
 
 
-
 // Enter your OpenAI API Key here between the quotes
-
 const API_KEY = '';  // ← If blank, script will prompt you to get one
 
 
-
 // You can change this prompt if you want – the idea here is to ask a simple question to test the connection
-
 const PROMPT = "What's the tallest mountain in the world?";
 
 
+// Use a different model if you want
+const MODEL = "gpt-4.1-mini";
 
 
 // ----------------------------------------------------------------------------------
-
-
 
 
 
@@ -40,8 +36,7 @@ function main() {
     }
 
     const startTime = new Date().getTime();
-    const modelName = "gpt-4.1-mini";
-    const output = generateTextOpenAI(PROMPT, API_KEY, modelName);
+    const output = generateTextOpenAI(PROMPT, API_KEY, MODEL);
     Logger.log("Text output: " + output);
 
     const endTime = new Date().getTime();

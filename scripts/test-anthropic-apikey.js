@@ -12,8 +12,6 @@
  */
 
 
-
-
 // Enter your Anthropic API Key here between the quotes
 const API_KEY = '';  // ← If blank, script will prompt you to get one
 
@@ -22,15 +20,11 @@ const API_KEY = '';  // ← If blank, script will prompt you to get one
 const PROMPT = 'Describe the view from the top of the tallest mountain in the world?';
 
 
-// There should be no need to change the model name.
-// Details are at: https://docs.anthropic.com/en/docs/about-claude/models/overview
+// Use a different model if you want
 const MODEL  = 'claude-sonnet-4-20250514';
 
 
-
 // ------------------------------------------------------------
-
-
 
 
 function main() {

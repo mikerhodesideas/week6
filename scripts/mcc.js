@@ -3,19 +3,19 @@
 // 1. SPREADSHEET URL (Optional)
 //    - Leave blank ("") to create a new spreadsheet automatically.
 //    - Or, paste the URL of an existing Google Sheet (e.g., "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit")
-const SHEET_URL = "";
+const SHEET_URL = '';
 
 // 2. TEST CID (Optional)
 //    - To run for a single account for testing, enter its Customer ID (e.g., "123-456-7890").
 //    - Leave blank ("") to run for all accounts under the MCC.
-const SINGLE_CID_FOR_TESTING = ""; // Example: "123-456-7890" or ""
+const SINGLE_CID_FOR_TESTING = ''; // Example: "123-456-7890" or ""
 
 // 3. TIME PERIOD
 //    - Choose "LAST_7_DAYS" or "LAST_30_DAYS".
-const SELECTED_TIME_PERIOD = "LAST_7_DAYS"; // Options: "LAST_7_DAYS", "LAST_30_DAYS"
+const SELECTED_TIME_PERIOD = 'LAST_7_DAYS'; // Options: "LAST_7_DAYS", "LAST_30_DAYS"
 
 // 4. SHEET NAME (Name of the tab within the spreadsheet)
-const SHEET_NAME = "DailyConversionData";
+const SHEET_NAME = 'DailyConversionData';
 
 // --- END OF CONFIGURATION ---
 

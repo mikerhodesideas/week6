@@ -11,11 +11,20 @@
  *   https://ai.google.dev/api/generate-content
  */
 
+
 // Enter your Gemini API Key here between the quotes
 const API_KEY = '';  // ← If blank, script will prompt you to get one
 
+
 // You can change this prompt if you want – the idea here is to ask a simple question to test the connection
 const PROMPT = "What are Google Ads scripts?";
+
+
+// Use a different model if you want
+const MODEL = "gemini-2.5-flash";
+
+
+// ----------------------------------------------------------------------------------
 
 function main() {
   try {
@@ -28,8 +37,7 @@ function main() {
     }
 
     const startTime = new Date().getTime();
-    const modelName = "gemini-2.5-flash";
-    const output = generateTextGemini(PROMPT, API_KEY, modelName);
+    const output = generateTextGemini(PROMPT, API_KEY, MODEL);
     Logger.log("Text output: " + output);
 
     const endTime = new Date().getTime();
@@ -63,7 +71,8 @@ function generateTextGemini(prompt, apiKey, model) {
       }
     ],
     "generationConfig": {
-      "maxOutputTokens": 1000
+      "maxOutputTokens": 8000,
+      "temperature": 0.1
       // Optional parameters available 
     }
   };
@@ -117,20 +126,34 @@ function generateTextGemini(prompt, apiKey, model) {
   // Parse the successful response
   try {
     const parsed = JSON.parse(responseText);
-    // The response contains an array "candidates", each with a "content.parts[0].text"
+    // Logger.log("Full response: " + responseText);
+    
+    if (!parsed || !Array.isArray(parsed.candidates) || parsed.candidates.length === 0) {
+      return "Error: No candidates in response.";
+    }
+    
+    const candidate = parsed.candidates[0];
+    
+    // Check for finish reason issues
+    if (candidate.finishReason === "MAX_TOKENS") {
+      return "Error: Response was cut off due to token limit. Try reducing maxOutputTokens or shortening your prompt.";
+    }
+    
+    if (candidate.finishReason === "SAFETY") {
+      return "Error: Response blocked for safety reasons.";
+    }
+    
+    // Check for content and parts
     if (
-      parsed &&
-      Array.isArray(parsed.candidates) &&
-      parsed.candidates.length > 0 &&
-      parsed.candidates[0].content &&
-      Array.isArray(parsed.candidates[0].content.parts) &&
-      parsed.candidates[0].content.parts.length > 0 &&
-      parsed.candidates[0].content.parts[0].text
+      candidate.content &&
+      Array.isArray(candidate.content.parts) &&
+      candidate.content.parts.length > 0 &&
+      candidate.content.parts[0].text
     ) {
-      return parsed.candidates[0].content.parts[0].text;
+      return candidate.content.parts[0].text;
     } else {
       Logger.log("Unexpected response structure: " + responseText);
-      return "Error: Unexpected response structure.";
+      return "Error: No text content in response. Check your prompt and API key.";
     }
   } catch (jsonError) {
     Logger.log("Error parsing Gemini API success response: " + jsonError);

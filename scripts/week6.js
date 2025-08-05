@@ -1,7 +1,7 @@
-// change the sheet name to your sheet
+// change the sheet url to your sheet
+const SHEET_URL = '';
 
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UighiMWgRVoc33mVNGerx7WDLZBCdxhdRdc32h5R_d8/edit?gid=0#gid=0';
-
+// tab names
 const SEARCH_TERMS_TAB = 'searchTerms';
 const DAILY_TAB = 'daily';
 const AD_GROUP_TAB = 'adGroups';  // New tab for ad group data
