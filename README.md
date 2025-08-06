@@ -1,20 +1,17 @@
-# Mike Rhodes - Build the Agent - Quick Template v1
+# Mike Rhodes - Build the Agent - Week 6
 
-Week 6 App
-New Scripts
-AI APIs
-New 'data insights' page
+## New this week
+- Week 6 App
+- New Scripts
+- AI APIs
+- New 'data insights' page
 
 
-## Environment Setup
-
-### API Keys Configuration
+## Environment Setup & API Keys Configuration
 Before using the AI insights feature, you need to configure API keys for the supported providers:
 
 1. **Copy the environment template:**
-   ```bash
-   cp .env.template .env.local
-   ```
+copy paste the .env.template using cursor, then rename it to .env and add your API keys
 
 2. **Add your API keys to `.env.local`:**
    - **OpenAI**: Get your key from [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
