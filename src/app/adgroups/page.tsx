@@ -196,9 +196,8 @@ export default function AdGroupsPage() {
             className="h-8 px-2 lg:px-3 hover:bg-blue-50 transition-colors"
         >
             {children}
-            <ArrowUpDown className="ml-2 h-3 w-3 opacity-50" />
             {sortField === field && (
-                <span className="ml-1 text-blue-600 font-bold">
+                <span className="ml-2 text-blue-600 font-bold">
                     {sortDirection === 'asc' ? '↑' : '↓'}
                 </span>
             )}
