@@ -72,7 +72,7 @@ export function useDataInsights(): UseDataInsightsReturn {
 
     // AI state
     const [prompt, setPrompt] = useState('')
-    const [selectedModel, setSelectedModel] = useState(AVAILABLE_MODELS[0]?.id || 'gpt-4.1-mini')
+    const [selectedModel, setSelectedModel] = useState(AVAILABLE_MODELS[0]?.id || 'gpt-4.1-nano')
     const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('openai')
     const [insights, setInsights] = useState<string | null>(null)
     const [tokenUsage, setTokenUsage] = useState<any>(null)
@@ -268,6 +268,34 @@ export function useDataInsights(): UseDataInsightsReturn {
         setFilters(prev => prev.filter(filter => filter.id !== id))
     }, [])
 
+    // Auto-select default model when provider changes
+    const handleProviderChange = useCallback((provider: LLMProvider) => {
+        setSelectedProvider(provider)
+        
+        // Set default model based on provider
+        let defaultModel: string
+        switch (provider) {
+            case 'openai':
+                defaultModel = 'gpt-4.1-nano'
+                break
+            case 'anthropic':
+                defaultModel = 'claude-sonnet-4'
+                break
+            case 'gemini':
+                defaultModel = 'gemini-2.5-flash'
+                break
+            default:
+                defaultModel = AVAILABLE_MODELS[0]?.id || 'gpt-4.1-nano'
+        }
+        
+        setSelectedModel(defaultModel)
+        
+        // Clear previous insights when changing provider
+        setInsights(null)
+        setInsightsError(null)
+        setTokenUsage(null)
+    }, [])
+
     // Reset filters when data source changes
     const handleDataSourceChange = useCallback((source: DataSourceType) => {
         setSelectedDataSource(source)
@@ -351,7 +379,7 @@ export function useDataInsights(): UseDataInsightsReturn {
         selectedModel,
         setSelectedModel,
         selectedProvider,
-        setSelectedProvider,
+        setSelectedProvider: handleProviderChange,
         insights,
         tokenUsage,
         isGeneratingInsights,
