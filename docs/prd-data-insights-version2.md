@@ -20,7 +20,7 @@ Create a Data Insights Generator that allows users to:
 ## User Flow
 
 1. User navigates to the Data Insights page
-2. User selects a data source from dropdown (same sources as main dashboard)
+2. User selects a data source from dropdown (same sources as the rest of the app)
 3. System displays preview of top 10 rows sorted by impressions (descending)
 4. User optionally applies filters to narrow down the dataset
 5. User enters their OpenAI API key
@@ -32,7 +32,7 @@ Create a Data Insights Generator that allows users to:
 
 ### Data Source Selection
 - **Type**: Dropdown selection
-- **Options**: Same data sources available on main dashboard
+- **Options**: Same data sources as the rest of the app
 - **Validation**: Must select a valid data source before proceeding
 
 ### API Key Input

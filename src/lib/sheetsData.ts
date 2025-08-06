@@ -63,7 +63,7 @@ async function fetchAndParseAdGroups(sheetUrl: string): Promise<AdGroupMetric[]>
       return [];
     }
 
-    return rawData.map((row: any) => ({
+    const processedData = rawData.map((row: any) => ({
       campaign: String(row['campaign'] || ''),
       campaignId: String(row['campaignId'] || ''),
       adGroup: String(row['adGroup'] || ''),
@@ -80,6 +80,8 @@ async function fetchAndParseAdGroups(sheetUrl: string): Promise<AdGroupMetric[]>
       cpa: Number(row['cpa'] || 0),
       roas: Number(row['roas'] || 0)
     }));
+    console.log(`AdGroups data processed: ${processedData.length} rows`, processedData.slice(0, 2));
+    return processedData;
   } catch (error) {
     console.error(`Error fetching ${tab} data:`, error);
     return [];
@@ -140,7 +142,7 @@ async function fetchAndParseDaily(sheetUrl: string): Promise<AdMetric[]> {
       return [];
     }
 
-    return rawData.map((row: any) => ({
+    const processedData = rawData.map((row: any) => ({
       campaign: String(row['campaign'] || ''),
       campaignId: String(row['campaignId'] || ''),
       clicks: Number(row['clicks'] || 0),
@@ -150,6 +152,8 @@ async function fetchAndParseDaily(sheetUrl: string): Promise<AdMetric[]> {
       impr: Number(row['impr'] || 0),
       date: String(row['date'] || '')
     }));
+    console.log(`Daily data processed: ${processedData.length} rows`, processedData.slice(0, 2));
+    return processedData;
   } catch (error) {
     console.error(`Error fetching ${tab} data:`, error);
     return [];
@@ -331,6 +335,49 @@ async function fetchAndParseLandingPages(sheetUrl: string): Promise<LandingPage[
 }
 
 export async function fetchAllTabsData(sheetUrl: string = DEFAULT_SHEET_URL): Promise<TabData> {
+  // Check sessionStorage first for ultra-fast loading (but only if data is valid)
+  if (typeof window !== 'undefined') {
+    try {
+      const cachedData = sessionStorage.getItem(`sheet-data-${sheetUrl}`)
+      const cachedTimestamp = sessionStorage.getItem(`sheet-data-timestamp-${sheetUrl}`)
+      
+      if (cachedData && cachedTimestamp) {
+        const age = Date.now() - parseInt(cachedTimestamp)
+        // Use cached data if it's less than 5 minutes old
+        if (age < 300000) {
+          const parsed = JSON.parse(cachedData)
+          // Only return cached data if it actually has data
+          if (parsed && typeof parsed === 'object' && 
+              (parsed.daily?.length > 0 || parsed.searchTerms?.length > 0 || 
+               parsed.adGroups?.length > 0 || parsed.assetGroups?.length > 0)) {
+            console.log('Using cached data from sessionStorage')
+            return parsed
+          } else {
+            // Clear bad cached data
+            console.log('Clearing invalid cached data')
+            sessionStorage.removeItem(`sheet-data-${sheetUrl}`)
+            sessionStorage.removeItem(`sheet-data-timestamp-${sheetUrl}`)
+          }
+        } else {
+          // Clear expired cached data
+          console.log('Clearing expired cached data')
+          sessionStorage.removeItem(`sheet-data-${sheetUrl}`)
+          sessionStorage.removeItem(`sheet-data-timestamp-${sheetUrl}`)
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to read cached data from sessionStorage:', error)
+      // Clear corrupted cached data
+      try {
+        sessionStorage.removeItem(`sheet-data-${sheetUrl}`)
+        sessionStorage.removeItem(`sheet-data-timestamp-${sheetUrl}`)
+      } catch (e) {
+        console.warn('Failed to clear corrupted cached data:', e)
+      }
+    }
+  }
+
+  console.log('Fetching fresh data from API')
   const [
     dailyData,
     searchTermsData,
@@ -354,6 +401,19 @@ export async function fetchAllTabsData(sheetUrl: string = DEFAULT_SHEET_URL): Pr
     fetchAndParseSharedListKeywords(sheetUrl),
     fetchAndParseLandingPages(sheetUrl)
   ]);
+
+  console.log('All data fetched:', {
+    daily: dailyData?.length || 0,
+    searchTerms: searchTermsData?.length || 0,
+    adGroups: adGroupsData?.length || 0,
+    assetGroups: assetGroupsData?.length || 0,
+    negativeKeywordLists: negativeKeywordListsData?.length || 0,
+    campaignNegatives: campaignNegativesData?.length || 0,
+    adGroupNegatives: adGroupNegativesData?.length || 0,
+    campaignStatus: campaignStatusData?.length || 0,
+    sharedListKeywords: sharedListKeywordsData?.length || 0,
+    landingPages: landingPagesData?.length || 0
+  });
 
   return {
     daily: dailyData || [],

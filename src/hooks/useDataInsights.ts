@@ -6,10 +6,8 @@ import { generateInsightsWithProvider } from '@/lib/api-router'
 import {
     DataSourceType,
     ColumnDefinition,
-    DataFilter,
     SortConfig,
     DataSummary,
-    FILTER_OPERATORS,
     TabData
 } from '@/lib/types'
 import {
@@ -29,11 +27,9 @@ export interface UseDataInsightsReturn {
     // Column management
     columns: ColumnDefinition[]
 
-    // Filtering
-    filters: DataFilter[]
-    addFilter: () => void
-    updateFilter: (id: string, updates: Partial<DataFilter>) => void
-    removeFilter: (id: string) => void
+    // AI Analysis
+    aiRowCount: number
+    setAiRowCount: (count: number) => void
 
     // Sorting and preview
     sortConfig: SortConfig | null
@@ -66,9 +62,9 @@ export function useDataInsights(): UseDataInsightsReturn {
 
     // Core state
     const [selectedDataSource, setSelectedDataSource] = useState<DataSourceType>('searchTerms')
-    const [filters, setFilters] = useState<DataFilter[]>([])
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
-    const [previewRowCount, setPreviewRowCount] = useState(DEFAULT_PREVIEW_ROWS)
+    const [previewRowCount, setPreviewRowCount] = useState(5)
+    const [aiRowCount, setAiRowCount] = useState(500)
 
     // AI state
     const [prompt, setPrompt] = useState('')
@@ -83,7 +79,13 @@ export function useDataInsights(): UseDataInsightsReturn {
     // Get raw data for selected source
     const rawData = useMemo(() => {
         if (!fetchedData) return []
-        return fetchedData[selectedDataSource] || []
+        const data = fetchedData[selectedDataSource] || []
+        console.log(`Data for ${selectedDataSource}:`, { 
+            length: data.length, 
+            sample: data.slice(0, 2),
+            availableKeys: fetchedData ? Object.keys(fetchedData) : [] 
+        })
+        return data
     }, [fetchedData, selectedDataSource])
 
     // Derive columns from raw data
@@ -105,6 +107,7 @@ export function useDataInsights(): UseDataInsightsReturn {
                 (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/))) {
                 type = 'date'
             }
+            // Everything else remains as dimension (including keyword, keywordText, searchTerm, campaign, adGroup, etc.)
 
             // Create user-friendly labels
             const label = key
@@ -120,55 +123,12 @@ export function useDataInsights(): UseDataInsightsReturn {
             })
         })
 
+        console.log(`Columns detected for ${selectedDataSource}:`, cols)
         return cols
-    }, [rawData])
+    }, [rawData, selectedDataSource])
 
-    // Apply filters
-    const filteredData = useMemo(() => {
-        if (!rawData.length || !filters.length) return rawData
-
-        return rawData.filter(row => {
-            return filters.every(filter => {
-                const value = row[filter.column]
-                const filterValue = filter.value
-
-                if (value == null) return false
-
-                switch (filter.operator) {
-                    case 'contains':
-                        return String(value).toLowerCase().includes(filterValue.toLowerCase())
-                    case 'not_contains':
-                        return !String(value).toLowerCase().includes(filterValue.toLowerCase())
-                    case 'equals':
-                        return String(value) === filterValue
-                    case 'not_equals':
-                        return String(value) !== filterValue
-                    case 'starts_with':
-                        return String(value).toLowerCase().startsWith(filterValue.toLowerCase())
-                    case 'ends_with':
-                        return String(value).toLowerCase().endsWith(filterValue.toLowerCase())
-                    case 'greater_than':
-                        return Number(value) > Number(filterValue)
-                    case 'less_than':
-                        return Number(value) < Number(filterValue)
-                    case 'greater_equal':
-                        return Number(value) >= Number(filterValue)
-                    case 'less_equal':
-                        return Number(value) <= Number(filterValue)
-                    case 'after':
-                        return new Date(value) > new Date(filterValue)
-                    case 'before':
-                        return new Date(value) < new Date(filterValue)
-                    case 'on_or_after':
-                        return new Date(value) >= new Date(filterValue)
-                    case 'on_or_before':
-                        return new Date(value) <= new Date(filterValue)
-                    default:
-                        return true
-                }
-            })
-        })
-    }, [rawData, filters])
+    // No filtering - use raw data directly
+    const filteredData = rawData
 
     // Apply sorting
     const sortedData = useMemo(() => {
@@ -247,26 +207,19 @@ export function useDataInsights(): UseDataInsightsReturn {
         return summary
     }, [filteredData, columns])
 
-    // Filter management functions
-    const addFilter = useCallback(() => {
-        const newFilter: DataFilter = {
-            id: Math.random().toString(36).substr(2, 9),
-            column: columns[0]?.key || '',
-            operator: 'equals',
-            value: ''
+    // Get AI data sorted by cost descending when possible
+    const getAiData = useMemo(() => {
+        const costColumn = columns.find(col => col.key.toLowerCase().includes('cost'))
+        if (costColumn) {
+            const sortedByCost = [...filteredData].sort((a, b) => {
+                const aCost = Number(a[costColumn.key]) || 0
+                const bCost = Number(b[costColumn.key]) || 0
+                return bCost - aCost // Descending
+            })
+            return sortedByCost.slice(0, aiRowCount)
         }
-        setFilters(prev => [...prev, newFilter])
-    }, [columns])
-
-    const updateFilter = useCallback((id: string, updates: Partial<DataFilter>) => {
-        setFilters(prev => prev.map(filter =>
-            filter.id === id ? { ...filter, ...updates } : filter
-        ))
-    }, [])
-
-    const removeFilter = useCallback((id: string) => {
-        setFilters(prev => prev.filter(filter => filter.id !== id))
-    }, [])
+        return filteredData.slice(0, aiRowCount)
+    }, [filteredData, columns, aiRowCount])
 
     // Auto-select default model when provider changes
     const handleProviderChange = useCallback((provider: LLMProvider) => {
@@ -296,10 +249,9 @@ export function useDataInsights(): UseDataInsightsReturn {
         setTokenUsage(null)
     }, [])
 
-    // Reset filters when data source changes
+    // Reset when data source changes
     const handleDataSourceChange = useCallback((source: DataSourceType) => {
         setSelectedDataSource(source)
-        setFilters([])
         setSortConfig(null)
         setInsights(null)
         setInsightsError(null)
@@ -314,21 +266,13 @@ export function useDataInsights(): UseDataInsightsReturn {
         setInsightsError(null)
 
         try {
-            // Limit data size for API
-            const dataToAnalyze = filteredData.slice(0, MAX_RECOMMENDED_INSIGHT_ROWS)
-
-            // Build filter descriptions
-            const filterDescriptions = filters.map(filter => {
-                const column = columns.find(col => col.key === filter.column)
-                const operator = FILTER_OPERATORS.find(op => op.value === filter.operator)
-                return `${column?.label || filter.column} ${operator?.label || filter.operator} "${filter.value}"`
-            })
+            const dataToAnalyze = getAiData
 
             const response = await generateInsightsWithProvider({
                 prompt,
                 data: dataToAnalyze,
                 dataSource: selectedDataSource,
-                filters: filterDescriptions,
+                filters: [], // No filters
                 totalRows: rawData.length,
                 analyzedRows: dataToAnalyze.length,
                 currency: '$', // Should come from settings
@@ -343,7 +287,7 @@ export function useDataInsights(): UseDataInsightsReturn {
         } finally {
             setIsGeneratingInsights(false)
         }
-    }, [prompt, filteredData, filters, columns, selectedDataSource, rawData.length, selectedProvider, selectedModel])
+    }, [prompt, filteredData, getAiData, selectedDataSource, rawData.length, selectedProvider, selectedModel])
 
     return {
         // Data source and loading
@@ -355,11 +299,9 @@ export function useDataInsights(): UseDataInsightsReturn {
         // Column management
         columns,
 
-        // Filtering
-        filters,
-        addFilter,
-        updateFilter,
-        removeFilter,
+        // AI Analysis
+        aiRowCount,
+        setAiRowCount,
 
         // Sorting and preview
         sortConfig,

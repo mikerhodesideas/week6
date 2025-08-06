@@ -16,7 +16,8 @@
       "Bash(mv:*)",
       "WebFetch(domain:github.com)",
       "Bash(node:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }

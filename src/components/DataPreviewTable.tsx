@@ -27,6 +27,10 @@ export function DataPreviewTable({
   onPreviewRowCountChange,
   totalRows
 }: DataPreviewTableProps) {
+  // Filter out unwanted columns
+  const filteredColumns = columns.filter(column => 
+    column.key !== 'keyword' // Hide the 'keyword' column specifically
+  )
   const handleSort = (columnKey: string) => {
     if (sortConfig?.column === columnKey) {
       if (sortConfig.direction === 'asc') {
@@ -78,7 +82,7 @@ export function DataPreviewTable({
   }
 
   return (
-    <Card>
+    <Card className="bg-green-50/50 border-green-200">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Data Preview</CardTitle>
@@ -105,7 +109,7 @@ export function DataPreviewTable({
           Showing {data.length} of {totalRows} total rows
           {sortConfig && (
             <span className="ml-2">
-              • Sorted by {columns.find(col => col.key === sortConfig.column)?.label} 
+              • Sorted by {filteredColumns.find(col => col.key === sortConfig.column)?.label} 
               ({sortConfig.direction === 'asc' ? 'ascending' : 'descending'})
             </span>
           )}
@@ -121,7 +125,7 @@ export function DataPreviewTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  {columns.map((column) => (
+                  {filteredColumns.map((column) => (
                     <TableHead key={column.key} className="font-medium">
                       <Button
                         variant="ghost"
@@ -139,7 +143,7 @@ export function DataPreviewTable({
               <TableBody>
                 {data.map((row, index) => (
                   <TableRow key={index}>
-                    {columns.map((column) => (
+                    {filteredColumns.map((column) => (
                       <TableCell key={column.key} className="font-mono text-sm">
                         {formatValue(row[column.key], column)}
                       </TableCell>

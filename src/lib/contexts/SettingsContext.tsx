@@ -51,13 +51,39 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('settings', JSON.stringify(settingsToSave))
   }, [settings])
 
-  // Fetch data using useSWR based on sheetUrl
+  // Fetch data using useSWR based on sheetUrl with smart caching
   const { data: fetchedData, error: dataError, isLoading: isDataLoading, mutate: refreshData } = useSWR<TabData>(
     settings.sheetUrl ? settings.sheetUrl : null,
     fetchAllTabsData,
     {
       revalidateOnFocus: false,
-      revalidateOnReconnect: false
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 1 minute - prevent duplicate requests
+      refreshInterval: 0, // Disable automatic refresh
+      errorRetryCount: 2, // Retry twice on error
+      loadingTimeout: 30000, // 30 second timeout
+      onSuccess: (data) => {
+        // Cache the data in sessionStorage only if it has actual data
+        if (data && (data.daily?.length > 0 || data.searchTerms?.length > 0 || 
+                     data.adGroups?.length > 0 || data.assetGroups?.length > 0)) {
+          try {
+            sessionStorage.setItem(`sheet-data-${settings.sheetUrl}`, JSON.stringify(data))
+            sessionStorage.setItem(`sheet-data-timestamp-${settings.sheetUrl}`, Date.now().toString())
+            console.log('Cached data to sessionStorage:', data)
+          } catch (error) {
+            console.warn('Failed to cache data in sessionStorage:', error)
+          }
+        }
+      },
+      onError: (error) => {
+        // Clear bad cached data on error
+        try {
+          sessionStorage.removeItem(`sheet-data-${settings.sheetUrl}`)
+          sessionStorage.removeItem(`sheet-data-timestamp-${settings.sheetUrl}`)
+        } catch (e) {
+          console.warn('Failed to clear cached data:', e)
+        }
+      }
     }
   )
 

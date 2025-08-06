@@ -2,6 +2,15 @@
 import type { LLMProvider, LLMResponse, GenerateInsightsOptions, InsightRequest } from './types/models'
 
 export async function generateInsightsWithProvider(options: GenerateInsightsOptions): Promise<LLMResponse> {
+    console.log('🚀 Generating insights with provider:', options.provider)
+    console.log('📊 Data summary:', {
+        dataSource: options.dataSource,
+        totalRows: options.totalRows,
+        analyzedRows: options.analyzedRows,
+        filtersCount: options.filters.length,
+        promptLength: options.prompt.length
+    })
+    
     const { prompt, data, dataSource, filters, totalRows, analyzedRows, currency, provider = 'openai', model = 'gpt-4.1-mini-2025-04-14' } = options
 
     // Prepare context for the AI
@@ -51,6 +60,7 @@ Please provide actionable insights, trends, and recommendations based on the dat
 }
 
 async function callOpenAI(systemPrompt: string, userPrompt: string, payload: InsightRequest): Promise<LLMResponse> {
+    console.log('🤖 Calling OpenAI API with model:', payload.model)
     try {
         const response = await fetch('/api/openai', {
             method: 'POST',
@@ -88,12 +98,13 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, payload: Ins
 }
 
 async function callAnthropic(systemPrompt: string, userPrompt: string, payload: InsightRequest): Promise<LLMResponse> {
+    console.log('🧠 Calling Anthropic API with model:', payload.model)
     try {
         const response = await fetch('/api/anthropic', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: payload.model || 'claude-3-sonnet-20240229',
+                model: payload.model || 'claude-sonnet-4-20250514',
                 system: systemPrompt,
                 messages: [
                     { role: 'user', content: `${userPrompt}\n\nData: ${JSON.stringify(payload.data, null, 2)}` }
@@ -103,17 +114,34 @@ async function callAnthropic(systemPrompt: string, userPrompt: string, payload: 
         })
 
         if (!response.ok) {
-            throw new Error(`Anthropic API error: ${response.statusText}`)
+            const errorText = await response.text()
+            console.error('❌ Anthropic API call failed:', {
+                status: response.status,
+                statusText: response.statusText,
+                errorText: errorText.substring(0, 500)
+            })
+            throw new Error(`Anthropic API error: ${response.status} - ${errorText.substring(0, 200)}`)
         }
 
         const result = await response.json()
+        console.log('✅ Anthropic API result structure:', {
+            hasContent: !!result.content,
+            contentLength: result.content?.length,
+            hasUsage: !!result.usage
+        })
+
+        // Safely parse Anthropic response
+        let content = 'No response generated'
+        if (result.content && Array.isArray(result.content) && result.content.length > 0) {
+            content = result.content[0]?.text || 'No text in response'
+        }
 
         return {
-            content: result.content[0]?.text || 'No response generated',
+            content,
             usage: result.usage ? {
-                inputTokens: result.usage.input_tokens,
-                outputTokens: result.usage.output_tokens,
-                totalTokens: result.usage.input_tokens + result.usage.output_tokens
+                inputTokens: result.usage.input_tokens || 0,
+                outputTokens: result.usage.output_tokens || 0,
+                totalTokens: (result.usage.input_tokens || 0) + (result.usage.output_tokens || 0)
             } : undefined,
             provider: 'anthropic',
             model: payload.model
@@ -124,35 +152,68 @@ async function callAnthropic(systemPrompt: string, userPrompt: string, payload: 
 }
 
 async function callGemini(systemPrompt: string, userPrompt: string, payload: InsightRequest): Promise<LLMResponse> {
+    console.log('💎 Calling Gemini API with model:', payload.model)
     try {
         const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                model: payload.model || 'gemini-2.5-flash',
                 contents: [{
                     parts: [{
                         text: `${systemPrompt}\n\n${userPrompt}\n\nData: ${JSON.stringify(payload.data, null, 2)}`
                     }]
                 }],
                 generationConfig: {
-                    maxOutputTokens: 2000,
+                    maxOutputTokens: 16000,
                     temperature: 0.7
                 }
             })
         })
 
         if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.statusText}`)
+            const errorText = await response.text()
+            console.error('❌ Gemini API call failed:', {
+                status: response.status,
+                statusText: response.statusText,
+                errorText: errorText.substring(0, 500)
+            })
+            throw new Error(`Gemini API error: ${response.status} - ${errorText.substring(0, 200)}`)
         }
 
         const result = await response.json()
 
+        // Safely parse Gemini response
+        let content = 'No response generated'
+        
+        if (result.candidates && Array.isArray(result.candidates) && result.candidates.length > 0) {
+            const candidate = result.candidates[0]
+            
+            // Check for blocked content first
+            if (candidate.finishReason === 'SAFETY') {
+                content = 'Response blocked for safety reasons'
+            } else if (candidate.finishReason === 'MAX_TOKENS') {
+                content = 'Response was cut off due to token limit'
+            } else if (candidate?.content?.parts && Array.isArray(candidate.content.parts) && candidate.content.parts.length > 0) {
+                const firstPart = candidate.content.parts[0]
+                if (firstPart && typeof firstPart === 'object' && 'text' in firstPart) {
+                    content = firstPart.text || 'Empty text response'
+                } else {
+                    content = 'No text property found in response part'
+                }
+            } else {
+                content = 'No content parts found in candidate'
+            }
+        } else {
+            content = 'No candidates found in response'
+        }
+
         return {
-            content: result.candidates[0]?.content?.parts[0]?.text || 'No response generated',
+            content,
             usage: result.usageMetadata ? {
-                inputTokens: result.usageMetadata.promptTokenCount,
-                outputTokens: result.usageMetadata.candidatesTokenCount,
-                totalTokens: result.usageMetadata.totalTokenCount
+                inputTokens: result.usageMetadata.promptTokenCount || 0,
+                outputTokens: result.usageMetadata.candidatesTokenCount || 0,
+                totalTokens: result.usageMetadata.totalTokenCount || 0
             } : undefined,
             provider: 'gemini',
             model: payload.model

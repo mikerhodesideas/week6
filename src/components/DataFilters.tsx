@@ -54,7 +54,7 @@ export function DataFilters({
   }
 
   return (
-    <Card>
+    <Card className="bg-blue-50/50 border-blue-200">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Filters</CardTitle>

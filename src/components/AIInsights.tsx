@@ -9,6 +9,8 @@ import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { Badge } from './ui/badge'
 import { LLMProvider, AVAILABLE_MODELS, TokenUsage } from '@/lib/types/models'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface AIInsightsProps {
     prompt: string
@@ -65,7 +67,7 @@ export function AIInsights({
     }
 
     return (
-        <Card>
+        <Card className="bg-purple-50/50 border-purple-200">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5" />
@@ -75,13 +77,25 @@ export function AIInsights({
                     Generate contextual insights from your filtered data using Large Language Models
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-                {/* Provider and Model Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+            <CardContent className="space-y-6">
+                {/* Input Row: Prompt (50%) + Provider (25%) + Model (25%) + Generate Button */}
+                <div className="grid grid-cols-12 gap-4 items-end">
+                    {/* Prompt - 50% width */}
+                    <div className="col-span-6 space-y-2">
+                        <Label>Prompt</Label>
+                        <Textarea
+                            value={prompt}
+                            onChange={(e) => onPromptChange(e.target.value)}
+                            placeholder="Enter your analysis prompt here... e.g., 'What are the key trends in this data?'"
+                            className="min-h-[100px] border-2 border-gray-200 hover:border-indigo-300 transition-colors"
+                        />
+                    </div>
+
+                    {/* Provider - 25% width */}
+                    <div className="col-span-3 space-y-2">
                         <Label>AI Provider</Label>
                         <Select value={selectedProvider} onValueChange={onProviderChange}>
-                            <SelectTrigger>
+                            <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 transition-colors">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -97,10 +111,11 @@ export function AIInsights({
                         </Select>
                     </div>
 
-                    <div className="space-y-2">
+                    {/* Model - 25% width */}
+                    <div className="col-span-3 space-y-2">
                         <Label>Model</Label>
                         <Select value={selectedModel} onValueChange={onModelChange}>
-                            <SelectTrigger>
+                            <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 transition-colors">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -114,39 +129,32 @@ export function AIInsights({
                     </div>
                 </div>
 
-                {/* Prompt Input */}
-                <div className="space-y-2">
-                    <Label>Prompt</Label>
-                    <Textarea
-                        value={prompt}
-                        onChange={(e) => onPromptChange(e.target.value)}
-                        placeholder="Enter your analysis prompt here... For example: 'What are the key trends in this data?' or 'Which search terms are underperforming and why?'"
-                        className="min-h-[100px]"
-                    />
-                    <div className="text-xs text-muted-foreground">
-                        Tip: Be specific about what insights you're looking for to get better results.
-                    </div>
+                {/* Generate Button Row */}
+                <div className="flex justify-center">
+                    <Button
+                        onClick={onGenerate}
+                        disabled={!canGenerate || isGenerating}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200 px-8 py-3 text-lg font-semibold"
+                        size="lg"
+                    >
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                Generating Insights...
+                            </>
+                        ) : (
+                            <>
+                                <Zap className="h-5 w-5 mr-2" />
+                                Generate AI Insights
+                            </>
+                        )}
+                    </Button>
                 </div>
 
-                {/* Generate Button */}
-                <Button
-                    onClick={onGenerate}
-                    disabled={!canGenerate || isGenerating}
-                    className="w-full"
-                    size="lg"
-                >
-                    {isGenerating ? (
-                        <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Generating Insights...
-                        </>
-                    ) : (
-                        <>
-                            <Zap className="h-4 w-4 mr-2" />
-                            Generate Insights
-                        </>
-                    )}
-                </Button>
+                {/* Helper Text */}
+                <div className="text-xs text-muted-foreground text-center">
+                    💡 Tip: Be specific about what insights you're looking for to get better results.
+                </div>
 
                 {/* Results Section */}
                 {error && (
@@ -167,34 +175,27 @@ export function AIInsights({
                             )}
                         </div>
 
-                        <div className="p-4 border rounded-lg bg-muted/50">
-                            <div className="prose prose-sm max-w-none">
-                                {insights.split('\n').map((paragraph, index) => {
-                                    if (!paragraph.trim()) return <br key={index} />
-
-                                    // Handle markdown-style formatting
-                                    if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-                                        return (
-                                            <h5 key={index} className="font-semibold mt-3 mb-1">
-                                                {paragraph.slice(2, -2)}
-                                            </h5>
-                                        )
-                                    }
-
-                                    if (paragraph.startsWith('- ')) {
-                                        return (
-                                            <li key={index} className="ml-4">
-                                                {paragraph.slice(2)}
-                                            </li>
-                                        )
-                                    }
-
-                                    return (
-                                        <p key={index} className="mb-2">
-                                            {paragraph}
-                                        </p>
-                                    )
-                                })}
+                        <div className="p-6 border rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-sm">
+                            <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700">
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        h1: ({ children }) => <h1 className="text-xl font-bold mb-3 text-indigo-900">{children}</h1>,
+                                        h2: ({ children }) => <h2 className="text-lg font-semibold mb-2 text-indigo-800">{children}</h2>,
+                                        h3: ({ children }) => <h3 className="text-md font-medium mb-2 text-indigo-700">{children}</h3>,
+                                        p: ({ children }) => <p className="mb-3 text-gray-700 leading-relaxed">{children}</p>,
+                                        ul: ({ children }) => <ul className="mb-3 ml-4 space-y-1">{children}</ul>,
+                                        ol: ({ children }) => <ol className="mb-3 ml-4 space-y-1">{children}</ol>,
+                                        li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                                        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                                        em: ({ children }) => <em className="italic text-gray-600">{children}</em>,
+                                        blockquote: ({ children }) => <blockquote className="border-l-4 border-indigo-300 pl-4 italic text-gray-600 my-3">{children}</blockquote>,
+                                        code: ({ children }) => <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-indigo-800">{children}</code>,
+                                        pre: ({ children }) => <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto my-3">{children}</pre>
+                                    }}
+                                >
+                                    {insights}
+                                </ReactMarkdown>
                             </div>
                         </div>
                     </div>

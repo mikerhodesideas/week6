@@ -33,7 +33,7 @@ export function DataSummary({ summary, columns }: DataSummaryProps) {
 
     if (summary.totalRows === 0) {
         return (
-            <Card>
+            <Card className="bg-amber-50/50 border-amber-200">
                 <CardHeader>
                     <CardTitle>Data Summary</CardTitle>
                 </CardHeader>
@@ -47,7 +47,7 @@ export function DataSummary({ summary, columns }: DataSummaryProps) {
     }
 
     return (
-        <Card>
+        <Card className="bg-amber-50/50 border-amber-200">
             <CardHeader>
                 <CardTitle>Data Summary</CardTitle>
                 <div className="text-sm text-muted-foreground">
