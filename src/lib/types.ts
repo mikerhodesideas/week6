@@ -68,7 +68,7 @@ export interface AssetGroupMetric {
 // Search term metrics - Core metrics from script
 export interface SearchTermMetric {
   searchTerm: string
-  keywordText?: string
+  keyword: string
   campaign: string
   adGroup: string
   impr: number
@@ -151,7 +151,7 @@ export interface DailyMetrics extends AdMetric {
 export type MetricKey = keyof Omit<AdMetric, 'campaign' | 'campaignId' | 'date'>
 
 // Search term metrics excluding metadata
-export type SearchTermMetricKey = keyof Omit<SearchTermMetric, 'searchTerm' | 'keywordText' | 'campaign' | 'adGroup'>
+export type SearchTermMetricKey = keyof Omit<SearchTermMetric, 'searchTerm' | 'keyword' | 'campaign' | 'adGroup'>
 
 // All possible metrics (regular + calculated)
 export type AllMetricKeys = MetricKey | keyof Omit<DailyMetrics, keyof AdMetric>

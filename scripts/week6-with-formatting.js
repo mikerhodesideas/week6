@@ -5,7 +5,7 @@ const NUMBER_OF_DAYS = 400;
 
 const TABS = {
   searchTerms: {
-    headers: ["searchTerm", "keywordText", "campaign", "adGroup", "impr", "clicks", "cost", "conv", "value", "cpc", "ctr", "convRate", "cpa", "roas"],
+    headers: ["searchTerm", "keyword", "campaign", "adGroup", "impr", "clicks", "cost", "conv", "value", "cpc", "ctr", "convRate", "cpa", "roas"],
     query: `SELECT search_term_view.search_term, segments.keyword.info.text, campaign.name, ad_group.name, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.conversions_value FROM search_term_view WHERE segments.date DURING LAST_30_DAYS AND campaign.advertising_channel_type = "SEARCH" AND metrics.impressions >= 30 ORDER BY metrics.cost_micros DESC`,
     fields: ['search_term_view.search_term', 'segments.keyword.info.text', 'campaign.name', 'ad_group.name'],
     includeCalculatedMetrics: true

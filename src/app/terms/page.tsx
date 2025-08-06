@@ -149,7 +149,7 @@ export default function TermsPage() {
                                 <SortButton field="searchTerm">Search Term</SortButton>
                             </TableHead>
                             <TableHead className="w-[180px] font-bold text-gray-900">
-                                <SortButton field="keyword">Keyword Text</SortButton>
+                                <SortButton field="keyword">Keyword</SortButton>
                             </TableHead>
                             <TableHead className="font-bold text-gray-900">
                                 <SortButton field="campaign">Campaign</SortButton>
@@ -193,7 +193,7 @@ export default function TermsPage() {
                         {paginatedTerms.map((term, i) => (
                             <TableRow key={`${term.searchTerm}-${term.campaign}-${term.adGroup}-${i}-${term.keyword}`}>
                                 <TableCell className="font-medium">{term.searchTerm}</TableCell>
-                                <TableCell>{(term as any).keywordText || term.keyword || '-'}</TableCell>
+                                <TableCell>{term.keyword || '-'}</TableCell>
                                 <TableCell>{term.campaign}</TableCell>
                                 <TableCell>{term.adGroup}</TableCell>
                                 <TableCell className="text-right">{formatNumber(term.impr)}</TableCell>

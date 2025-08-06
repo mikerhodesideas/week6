@@ -33,7 +33,6 @@ async function fetchAndParseSearchTerms(sheetUrl: string): Promise<SearchTermMet
     return rawData.map((row: any) => ({
       searchTerm: String(row['searchTerm'] || ''),
       keyword: String(row['keyword'] || ''),
-      keywordText: String(row['keywordText'] || ''),
       campaign: String(row['campaign'] || ''),
       adGroup: String(row['adGroup'] || ''),
       impr: Number(row['impr'] || 0),
@@ -318,13 +317,13 @@ async function fetchAndParseLandingPages(sheetUrl: string): Promise<LandingPage[
 
     return rawData.map((row: any) => ({
       url: String(row['url'] || ''),
-      impr: Number(row['impr'] || 0),
+      impressions: Number(row['impr'] || 0),
       clicks: Number(row['clicks'] || 0),
       cost: Number(row['cost'] || 0),
-      conv: Number(row['conv'] || 0),
+      conversions: Number(row['conv'] || 0),
       value: Number(row['value'] || 0),
       ctr: Number(row['ctr'] || 0),
-      convRate: Number(row['convRate'] || 0),
+      cvr: Number(row['convRate'] || 0),
       cpa: Number(row['cpa'] || 0),
       roas: Number(row['roas'] || 0)
     }));

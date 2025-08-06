@@ -17,7 +17,8 @@
       "WebFetch(domain:github.com)",
       "Bash(node:*)",
       "Bash(rm:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git apply:*)"
     ],
     "deny": []
   }

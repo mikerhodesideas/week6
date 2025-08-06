@@ -27,10 +27,8 @@ export function DataPreviewTable({
   onPreviewRowCountChange,
   totalRows
 }: DataPreviewTableProps) {
-  // Filter out unwanted columns
-  const filteredColumns = columns.filter(column => 
-    column.key !== 'keyword' // Hide the 'keyword' column specifically
-  )
+  // Use all columns without filtering
+  const filteredColumns = columns
   const handleSort = (columnKey: string) => {
     if (sortConfig?.column === columnKey) {
       if (sortConfig.direction === 'asc') {
