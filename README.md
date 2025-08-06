@@ -1,9 +1,10 @@
 # Mike Rhodes - Build the Agent - Quick Template v1
 
-This is a template project for builders to create applications with AI.
+Week 6 App
+New Scripts
+AI APIs
+New 'data insights' page
 
-## Getting started
-Use cursor composer to create whatever you can think of!
 
 ## Environment Setup
 
