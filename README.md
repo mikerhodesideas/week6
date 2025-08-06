@@ -7,6 +7,8 @@
 - New 'data insights' page
 
 
+
+
 ## Environment Setup & API Keys Configuration
 Before using the AI insights feature, you need to configure API keys for the supported providers:
 
